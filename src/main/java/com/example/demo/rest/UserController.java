@@ -12,7 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+/**
 
+ *
+ * @author salasky
+ * https://github.com/salasky/
+ */
 @RestController
 @RequestMapping("/api/v0/pool/client/")
 @CrossOrigin("*")
@@ -45,6 +50,13 @@ public class UserController {
     public Optional<User> getUser(@PathVariable long id) {
         Optional<User> user=userService.getUserById(id);
         return user;
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity updateUser(@RequestBody User user)
+    {
+        return userService.updateUser(user);
+
     }
 
 }

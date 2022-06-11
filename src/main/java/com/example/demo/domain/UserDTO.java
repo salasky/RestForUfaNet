@@ -1,6 +1,16 @@
 package com.example.demo.domain;
 
+import lombok.*;
 
+/**
+
+ *
+ * @author salasky
+ * https://github.com/salasky/
+ */
+@Getter
+@Setter
+@ToString
 public class UserDTO {
     private long id;
     private String name;
@@ -10,27 +20,4 @@ public class UserDTO {
         this.name = name;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

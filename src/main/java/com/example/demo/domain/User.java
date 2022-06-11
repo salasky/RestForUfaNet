@@ -3,7 +3,12 @@ package com.example.demo.domain;
 import lombok.*;
 
 import javax.persistence.*;
+/**
 
+ *
+ * @author salasky
+ * https://github.com/salasky/
+ */
 
 @Entity
 @Table(name = "Clients")
@@ -13,8 +18,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
-
 
     @Column(name = "name")
     private String name;
