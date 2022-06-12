@@ -23,10 +23,8 @@ import java.util.Optional;
 @CrossOrigin("*")
 public class UserController {
 
-    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private UserService userService;
-    private UserValidate userValidate;
 
     @Autowired
     public UserController(UserService userService) {
@@ -56,6 +54,13 @@ public class UserController {
     public ResponseEntity updateUser(@RequestBody User user)
     {
         return userService.updateUser(user);
+
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity deleteUser(@RequestBody User user)
+    {
+        return userService.deleteUser(user);
 
     }
 

@@ -38,19 +38,17 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ResponseEntity<String> createUser(User user) {
 
-		User existingUser1 =getUserEmail(user.getEmail());
+		User existingUser1 = getUserByEmail(user.getEmail());
 		if (null != existingUser1) {
 			logger.error("Пользователь с email "+existingUser1.getEmail()+" уже существует");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с email "+existingUser1.getEmail()+" уже существует");
 		}
 
-		User existingUser2 =getUserPhone(user.getPhone());
+		User existingUser2 = getUserByPhone(user.getPhone());
 		if (null != existingUser2) {
 			logger.error("Пользователь с номером "+existingUser2.getPhone()+" уже существует");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с номером "+existingUser2.getPhone()+" уже существует");
 		}
-
-
 
 		if(!userValidate.isValidName(user.getName())){
 			logger.error("Неправильный формат имени");
@@ -67,14 +65,15 @@ public class UserServiceImpl implements UserService {
 		}
 
 		 userRepository.save(user);
+		 logger.info("Пользователь "+user.getName()+" создан\n");
 		 return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь "+user.getName()+" создан\n");
 	}
 
 
-	public User getUserEmail(String email) {
+	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
-	public User getUserPhone(String phone) {
+	public User getUserByPhone(String phone) {
 		return userRepository.findByPhone(phone);
 	}
 
@@ -101,13 +100,13 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ResponseEntity<String> updateUser(User user) {
 
-		User existingUser4 =getUserEmail(user.getEmail());
+		User existingUser4 = getUserByEmail(user.getEmail());
 		if (null != existingUser4 && existingUser4.getId()!=user.getId()) {
 			logger.error("Пользователь с email "+existingUser4.getEmail()+" уже существует");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с email "+existingUser4.getEmail()+" уже существует");
 		}
 
-		User existingUser3 =getUserPhone(user.getPhone());
+		User existingUser3 = getUserByPhone(user.getPhone());
 		if (null != existingUser3 && existingUser3.getId()!=user.getId()) {
 			logger.error("Пользователь с номером "+existingUser3.getPhone()+" уже существует");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с номером "+existingUser3.getPhone()+" уже существует");
@@ -138,11 +137,14 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public void deleteUser(long id) {
-		userRepository.deleteById(id);
-		
+	public ResponseEntity deleteUser(User user) {
+		Optional<User> user1=userRepository.findById(user.getId());
+		if(!user1.isEmpty()){
+			userRepository.deleteById(user.getId());
+			return ResponseEntity.status(HttpStatus.OK).body("Пользователь с id "+user.getId()+ " удален");
+		}
+		else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Нет пользователя с id "+user.getId());
+
 	}
-
-
 
 }
