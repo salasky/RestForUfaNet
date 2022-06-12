@@ -85,6 +85,7 @@ public class UserServiceImpl implements UserService {
 		if(list!=null){
 			userDTOList=list.stream().map(l->new UserDTO(l.getId(),l.getName())).collect(Collectors.toList());
 		}
+		logger.info("Выдан список клиентов");
 		return userDTOList;
 	}
 
@@ -94,45 +95,54 @@ public class UserServiceImpl implements UserService {
 		if(user.isEmpty()) {
 			logger.error("Пользователь с id " + id + " не найден");
 		}
+		if(!user.isEmpty()) {
+			logger.info("Выдана информация о пользователе c id "+id);
+		}
+
 		return user;
 	}
 
 	@Override
 	public ResponseEntity<String> updateUser(User user) {
 
-		User existingUser4 = getUserByEmail(user.getEmail());
-		if (null != existingUser4 && existingUser4.getId()!=user.getId()) {
-			logger.error("Пользователь с email "+existingUser4.getEmail()+" уже существует");
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с email "+existingUser4.getEmail()+" уже существует");
-		}
+		if(!userRepository.findById(user.getId()).isEmpty()) {
+			User existingUser4 = getUserByEmail(user.getEmail());
+			if (null != existingUser4 && existingUser4.getId() != user.getId()) {
+				logger.error("Пользователь с email " + existingUser4.getEmail() + " уже существует");
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с email " + existingUser4.getEmail() + " уже существует");
+			}
 
-		User existingUser3 = getUserByPhone(user.getPhone());
-		if (null != existingUser3 && existingUser3.getId()!=user.getId()) {
-			logger.error("Пользователь с номером "+existingUser3.getPhone()+" уже существует");
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с номером "+existingUser3.getPhone()+" уже существует");
-		}
+			User existingUser3 = getUserByPhone(user.getPhone());
+			if (null != existingUser3 && existingUser3.getId() != user.getId()) {
+				logger.error("Пользователь с номером " + existingUser3.getPhone() + " уже существует");
+				return ResponseEntity.status(HttpStatus.CONFLICT).body("Пользователь с номером " + existingUser3.getPhone() + " уже существует");
+			}
 
-		if(!userValidate.isValidName(user.getName())){
-			logger.error("Неправильный формат имени");
-			return ResponseEntity.status((HttpStatus.FORBIDDEN)).body("Неправильный формат имени");
-		}
-		if(!userValidate.isValidPhoneNumber(user.getPhone())){
-			logger.error("Неправильный формат номера");
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Неправильный формат номера");
-		}
+			if (!userValidate.isValidName(user.getName())) {
+				logger.error("Неправильный формат имени");
+				return ResponseEntity.status((HttpStatus.FORBIDDEN)).body("Неправильный формат имени");
+			}
+			if (!userValidate.isValidPhoneNumber(user.getPhone())) {
+				logger.error("Неправильный формат номера");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Неправильный формат номера");
+			}
 
-		if (!userValidate.isValidEmail(user.getEmail())){
-			logger.error("Неправильный формат email");
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Неправильный формат email");
-		}
+			if (!userValidate.isValidEmail(user.getEmail())) {
+				logger.error("Неправильный формат email");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Неправильный формат email");
+			}
 
-		userRepository.save(user);
-		return ResponseEntity.status(HttpStatus.CREATED).body("Данные пользователя обновлены на \n" +
-				"id: "+user.getId()+"\n"+
-				"name: "+user.getName()+"\n"+
-				"email: "+user.getEmail()+"\n"+
-				"phone: "+user.getPhone()+"\n"
-		);
+			userRepository.save(user);
+			logger.info("Данные пользователя " + user.getName() + " обновлены\n");
+			return ResponseEntity.status(HttpStatus.CREATED).body("Данные пользователя обновлены на \n" +
+					"id: " + user.getId() + "\n" +
+					"name: " + user.getName() + "\n" +
+					"email: " + user.getEmail() + "\n" +
+					"phone: " + user.getPhone() + "\n"
+			);
+		}
+		else
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пользователь с id "+user.getId()+ " не существует");
 	}
 
 
@@ -141,6 +151,7 @@ public class UserServiceImpl implements UserService {
 		Optional<User> user1=userRepository.findById(user.getId());
 		if(!user1.isEmpty()){
 			userRepository.deleteById(user.getId());
+			logger.info("Пользователь с id "+user.getId()+ " удален");
 			return ResponseEntity.status(HttpStatus.OK).body("Пользователь с id "+user.getId()+ " удален");
 		}
 		else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Нет пользователя с id "+user.getId());
