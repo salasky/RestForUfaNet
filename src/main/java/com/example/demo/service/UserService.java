@@ -3,7 +3,7 @@ package com.example.demo.service;
 
 
 import com.example.demo.domain.User;
-import com.example.demo.domain.UserDTO;
+import com.example.demo.dto.UserDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

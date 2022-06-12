@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.User;
-import com.example.demo.domain.UserDTO;
+import com.example.demo.dto.UserDTO;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.userValidation.UserValidate;
 import org.slf4j.Logger;
