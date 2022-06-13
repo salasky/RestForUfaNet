@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService{
         //Проверка записи в рабочее время
         if (Integer.parseInt(hours)<9 ||Integer.parseInt(hours)>20){
             logger.error("Попытка записи клиента в нерабочее время");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нельзя записаться в нерабочее время \n" +
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пожалуйста,запишитесь в рабочее время \n" +
                     "График работы с 09:00 до 20:00");
         }
 
@@ -80,29 +80,48 @@ public class OrderServiceImpl implements OrderService{
                     "Запись возможна на на 10:00, 11:00 итд");
         }
 
+
+        String [] dataAndTime=clientIdDatetime.getDatetime().split("\s");
+        String date=dataAndTime[0];
+        String time=dataAndTime[1];
+
         //Проверка количества записей на 1 час
-        if(orderRepository.countOrderByDate(clientIdDatetime.getDatetime())>10) {
+        if(orderRepository.countByDate(date)>10) {
             logger.error("Попытка записи клиента при полной записи");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините запись на данное время заполнена\n");
         }
 
 
-        long countUserRecord=orderRepository.countOrderByDateAndAndUser(clientIdDatetime.getDatetime(),userRepository.getReferenceById(clientIdDatetime.getClientId()));
-
+        Order existOrder=orderRepository.findByDateAndTimeAndUser(date,time,userRepository.getReferenceById(clientIdDatetime.getClientId()));
         //Проверка повторной записи
-        if(countUserRecord>1){
+        if(existOrder!=null){
             logger.error("Попытка повторной записи на одно и то же время");
-            return ResponseEntity.status(HttpStatus.CREATED).body("Вы уже записаны на данное время");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы уже записаны на данное время");
         }
 
 
+        //Проверка записи клиента больше 2 раза за день
+        if(orderRepository.countByDateAndUser(date,userRepository.getReferenceById(clientIdDatetime.getClientId()))>=2){
+            logger.error("Попытка записи более 2 раз в один день");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините, в день возможна запись только 1 раз длительностью до 2-х часов");
+        }
 
 
+        //Проверка записи клиента больше 1 раза за день c разницей более 1 часа
+        if(orderRepository.countByDateAndUser(date,userRepository.getReferenceById(clientIdDatetime.getClientId()))>=1){
+            if (Math.abs(Integer.parseInt(time.split(":")[0])-
+                    Integer.parseInt(orderRepository.findByDateAndUser(date,userRepository.getReferenceById(clientIdDatetime.getClientId())).getTime()
+                            .split(":")[0]))>1  ) {
 
-        orderRepository.save(new Order(clientIdDatetime.getDatetime(),userRepository.getReferenceById(clientIdDatetime.getClientId())));
-        logger.info("Запись клиента произошло успешно");
-        Order order=orderRepository.findByDateAndAndUser(clientIdDatetime.getDatetime(),userRepository.getReferenceById(clientIdDatetime.getClientId()));
-        OrderIdDTO orderIdDTO=new OrderIdDTO(order.getId());
+                logger.error("Попытка записи более 2 раз в один день7");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините, в день возможна запись только 1 раз длительностью до 2-х часов");
+            }
+        }
+
+        //запись в бд
+        long id=orderRepository.save(new Order(date,time,userRepository.getReferenceById(clientIdDatetime.getClientId()))).getId();
+        logger.info("Запись клиента произошла успешно");
+        OrderIdDTO orderIdDTO=new OrderIdDTO(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderIdDTO);
     }
 }

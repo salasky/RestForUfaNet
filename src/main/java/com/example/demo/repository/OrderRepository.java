@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
-    long countOrderByDate(String date);
-    Order findByDateAndAndUser(String date, User user);
-    long countOrderByDateAndAndUser(String date,User user);
-    List<Order> findAllByUserId(long id);
-    List<Long> getAllByUserId(long id);
+    long countByDateAndTime(String date,String time);
+    long countByDateAndUser(String date,User user);
+    Order findByDateAndUser(String date, User user);
+    Order findByDateAndTimeAndUser(String date,String time,User user);
+
+    long countByDate(String date);
+    long countByDateAndTimeAndUser(String date,String time,User user);
+
+
 }
