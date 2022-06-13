@@ -1,4 +1,4 @@
-package com.example.demo.userValidation;
+package com.example.demo.validator;
 
 
 import org.springframework.stereotype.Component;
@@ -8,9 +8,6 @@ import java.util.regex.Pattern;
 
 @Component
 public class UserValidate {
-
-    //Паттерны для примера.!! Добавить проверку на уникальность email и phone.
-
 
     private Pattern namePatter = Pattern.compile("^[a-zA-Z]*$");
     private Pattern phonePatter = Pattern.compile("^[0-9]*$");

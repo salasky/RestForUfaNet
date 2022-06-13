@@ -3,7 +3,7 @@ package com.example.demo.service;
 import com.example.demo.domain.User;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.userValidation.UserValidate;
+import com.example.demo.validator.UserValidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		 userRepository.save(user);
-		 logger.info("Пользователь "+user.getName()+" создан\n");
+		 logger.info("Пользователь "+user.getName()+" создан");
 		 return ResponseEntity.status(HttpStatus.CREATED).body("Пользователь "+user.getName()+" создан\n");
 	}
 
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
 			}
 
 			userRepository.save(user);
-			logger.info("Данные пользователя " + user.getName() + " обновлены\n");
+			logger.info("Данные пользователя " + user.getName() + " обновлены");
 			return ResponseEntity.status(HttpStatus.CREATED).body("Данные пользователя обновлены на \n" +
 					"id: " + user.getId() + "\n" +
 					"name: " + user.getName() + "\n" +
