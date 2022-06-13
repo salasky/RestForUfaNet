@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ClientIdDatetime {
+public class ClientIdOrderIdDTO {
     private long clientId;
-    private String datetime;
+    private String orderId;
 }

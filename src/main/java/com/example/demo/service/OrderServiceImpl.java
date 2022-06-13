@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Order;
-import com.example.demo.dto.ClientIdDatetime;
+import com.example.demo.dto.ClientIdDatetimeDTO;
+import com.example.demo.dto.ClientIdOrderIdDTO;
 import com.example.demo.dto.OrderIdDTO;
 import com.example.demo.dto.TimeCountDTO;
 import com.example.demo.repository.OrderRepository;
@@ -10,11 +11,12 @@ import com.example.demo.validator.DateValidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 
@@ -46,7 +48,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public ResponseEntity recordingClient(ClientIdDatetime clientIdDatetime) {
+    public ResponseEntity recordingClient(ClientIdDatetimeDTO clientIdDatetime) {
 
         //Проверка существования клиента
         if(userRepository.findById(clientIdDatetime.getClientId()).isEmpty()){
@@ -123,5 +125,18 @@ public class OrderServiceImpl implements OrderService{
         logger.info("Запись клиента произошла успешно");
         OrderIdDTO orderIdDTO=new OrderIdDTO(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderIdDTO);
+    }
+
+    @Override
+    public ResponseEntity cancelingRecord(ClientIdOrderIdDTO clientIdOrderIdDTO) {
+        if(orderRepository.findByIdAndUser(Long.parseLong(clientIdOrderIdDTO.getOrderId()),userRepository.getReferenceById(clientIdOrderIdDTO.getClientId()))==null)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Запись или клиент с данными id не найдена");
+
+        }
+        logger.info("Запись с ClientId "+clientIdOrderIdDTO.getClientId()+" OrderId "+clientIdOrderIdDTO.getOrderId()+" удалена");
+        orderRepository.deleteOrderByIdAndUser(Long.parseLong(clientIdOrderIdDTO.getOrderId()),userRepository.getReferenceById(clientIdOrderIdDTO.getClientId()));
+        return ResponseEntity.status(HttpStatus.OK).body("Запись с ClientId "+clientIdOrderIdDTO.getClientId()+"\n" +
+                "OrderId "+clientIdOrderIdDTO.getOrderId()+" удалена");
     }
 }

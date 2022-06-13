@@ -1,7 +1,7 @@
 package com.example.demo.rest;
 
-import com.example.demo.domain.User;
-import com.example.demo.dto.ClientIdDatetime;
+import com.example.demo.dto.ClientIdDatetimeDTO;
+import com.example.demo.dto.ClientIdOrderIdDTO;
 import com.example.demo.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +26,15 @@ public class OrderController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity saveUser(@RequestBody ClientIdDatetime clientIdDatetime)
+    public ResponseEntity saveUser(@RequestBody ClientIdDatetimeDTO clientIdDatetime)
     {
         return orderService.recordingClient(clientIdDatetime);
+
+    }
+    @PostMapping("/cancel")
+    public ResponseEntity cancelingRecord(@RequestBody ClientIdOrderIdDTO clientIdOrderIdDTO)
+    {
+        return orderService.cancelingRecord(clientIdOrderIdDTO);
 
     }
 
