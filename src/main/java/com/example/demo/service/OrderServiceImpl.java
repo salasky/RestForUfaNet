@@ -1,16 +1,20 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Order;
+import com.example.demo.domain.User;
 import com.example.demo.dto.*;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.validator.DateValidate;
+import com.example.demo.validator.UserValidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * @author salasky
@@ -23,12 +27,14 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     private UserRepository userRepository;
     private DateValidate dateValidate;
+    private UserValidate userValidate;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, DateValidate dateValidate) {
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, DateValidate dateValidate, UserValidate userValidate) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.dateValidate = dateValidate;
+        this.userValidate = userValidate;
     }
 
 
@@ -104,9 +110,9 @@ public class OrderServiceImpl implements OrderService {
         String time = dataAndTime[1];
 
         //Проверка количества записей на 1 час
-        if (orderRepository.countOrderByDateAndTime(date,time) > 10) {
+        if (orderRepository.countOrderByDateAndTime(date, time) > 10) {
             logger.error("Попытка записи клиента при полной записи");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините запись на "+time+" заполнена\n");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините запись на " + time + " заполнена\n");
         }
 
 
@@ -121,14 +127,14 @@ public class OrderServiceImpl implements OrderService {
         //Проверка записи клиента больше 2 раза за день
         if (orderRepository.countByDateAndUser(date, userRepository.getReferenceById(clientIdDatetime.getClientId())) >= 2) {
             logger.error("Попытка записи более 2 раз в один день");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините, в день возможна запись только 1 раз длительностью до 2-х часов");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините, в день возможна запись только 1 раз длительностью до 2-х часов!");
         }
 
 
         //Проверка записи клиента больше 1 раза за день c разницей более 1 часа
         if (orderRepository.countByDateAndUser(date, userRepository.getReferenceById(clientIdDatetime.getClientId())) >= 1) {
             if (Math.abs(Integer.parseInt(time.split(":")[0]) -
-                    Integer.parseInt(orderRepository.findByDateAndUser(date, userRepository.getReferenceById(clientIdDatetime.getClientId())).getTime()
+                    Integer.parseInt(orderRepository.findByDateAndUser(date, userRepository.getReferenceById(clientIdDatetime.getClientId())).get(0).getTime()
                             .split(":")[0])) > 1) {
 
                 logger.error("Попытка записи более 2 раз в один день7");
@@ -157,7 +163,39 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ResponseEntity findByNameAndDate() {
-        return null;
+    public ResponseEntity findByNameAndDate(FindByNameDateDTO findByNameDateDTO) {
+        if (!userValidate.isValidName(findByNameDateDTO.getName())) {
+            logger.error("Поиск по неправильному формату имени");
+            return ResponseEntity.status((HttpStatus.FORBIDDEN)).body("Неправильный формат имени");
+        }
+        if (!dateValidate.isValidDate(findByNameDateDTO.getDate())) {
+            logger.error("Поиск по неправильному формату даты");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Неправильный формат даты \n" +
+                    "Формат записи даты YYYY-MM-DD HH:MM");
+        }
+
+        if (!userValidate.isValidPhoneNumber(findByNameDateDTO.getPhone())) {
+            logger.error("Ошибка поиска.Номер содержит буквы.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Номер не может содержать буквы");
+        }
+
+        String name = findByNameDateDTO.getName();
+        String date = findByNameDateDTO.getDate();
+        String phone = findByNameDateDTO.getPhone();
+
+        Optional<User> user = userRepository.findByNameAndPhone(name, phone);
+        if (user.isPresent()) {
+
+            var order = orderRepository.findByDateAndUser(date, userRepository.getReferenceById(user.get().getId()));
+            if (order != null) {
+                logger.info("Выдача информации о записи по ФИО и дате");
+                return ResponseEntity.status(HttpStatus.OK).body(order);
+            }
+            logger.error("Нет записи с такими параметрами");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет записи с заданными параметрами");
+
+        }
+        logger.error("Нет пользователя с таким сочетанием имени и телефонного номера");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет пользователя с таким именем");
     }
 }

@@ -14,10 +14,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     long countByDateAndUser(String date, User user);
 
-    Order findByDateAndUser(String date, User user);
+    List<Order> findByDateAndUser(String date, User user);
+
+
 
     Order findByDateAndTimeAndUser(String date, String time, User user);
-
 
     long countOrderByDateAndTime(String date,String time);
 

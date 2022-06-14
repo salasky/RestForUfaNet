@@ -2,6 +2,7 @@ package com.example.demo.rest;
 
 import com.example.demo.dto.ClientIdDatetimeDTO;
 import com.example.demo.dto.ClientIdOrderIdDTO;
+import com.example.demo.dto.FindByNameDateDTO;
 import com.example.demo.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,12 @@ public class OrderController {
     @ResponseBody
     public ResponseEntity getAvailableTime(@PathVariable String date) {
         return orderService.getAvailableTime(date);
+    }
+
+    @PostMapping("/find")
+    public ResponseEntity findByNameAndDate(@RequestBody FindByNameDateDTO findByNameDateDTO) {
+        return orderService.findByNameAndDate(findByNameDateDTO);
+
     }
 
 

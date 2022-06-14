@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.ClientIdDatetimeDTO;
 import com.example.demo.dto.ClientIdOrderIdDTO;
+import com.example.demo.dto.FindByNameDateDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface OrderService {
@@ -13,5 +14,5 @@ public interface OrderService {
 
     public ResponseEntity cancelingRecord(ClientIdOrderIdDTO clientIdOrderIdDTO);
 
-    public  ResponseEntity findByNameAndDate();
+    public  ResponseEntity findByNameAndDate(FindByNameDateDTO findByNameDateDTO);
 }
