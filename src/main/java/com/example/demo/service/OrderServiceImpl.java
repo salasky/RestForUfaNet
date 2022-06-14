@@ -5,6 +5,7 @@ import com.example.demo.domain.User;
 import com.example.demo.dto.*;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.shell.HolidayShell;
 import com.example.demo.validator.DateValidate;
 import com.example.demo.validator.UserValidate;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -36,6 +38,9 @@ public class OrderServiceImpl implements OrderService {
         this.dateValidate = dateValidate;
         this.userValidate = userValidate;
     }
+
+
+
 
 
     @Override
@@ -88,8 +93,23 @@ public class OrderServiceImpl implements OrderService {
         String[] datesplit = clientIdDatetime.getDatetime().split("-|\s|:");
         String hours = datesplit[3];
         String mm = datesplit[4];
+        String [] dateholiday=clientIdDatetime.getDatetime().split("\s");
+        String dateholid=dateholiday[0];
 
-        //Проверка записи в рабочее время
+        //Проверка записи в рабочее время c учетом праздничных дней
+        if(!HolidayShell.holidayList.isEmpty()){
+            for (String s:HolidayShell.holidayList
+                 ) {
+                if(s.equals(dateholid)){
+                    if (Integer.parseInt(hours) < 10 || Integer.parseInt(hours) >17) {
+                        logger.error("Попытка записи клиента в нерабочее время");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пожалуйста,запишитесь в рабочее время \n" +
+                                "График работы в праздничные дни с 10:00 до 18:00");
+                    }
+                }
+            }
+        }
+
         if (Integer.parseInt(hours) < 9 || Integer.parseInt(hours) > 20) {
             logger.error("Попытка записи клиента в нерабочее время");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Пожалуйста,запишитесь в рабочее время \n" +
@@ -137,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
                     Integer.parseInt(orderRepository.findByDateAndUser(date, userRepository.getReferenceById(clientIdDatetime.getClientId())).get(0).getTime()
                             .split(":")[0])) > 1) {
 
-                logger.error("Попытка записи более 2 раз в один день7");
+                logger.error("Попытка записи более 2 раз в один день");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Извините, в день возможна запись только 1 раз длительностью до 2-х часов");
             }
         }
@@ -198,4 +218,6 @@ public class OrderServiceImpl implements OrderService {
         logger.error("Нет пользователя с таким сочетанием имени и телефонного номера");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Нет пользователя с таким именем");
     }
+
+
 }

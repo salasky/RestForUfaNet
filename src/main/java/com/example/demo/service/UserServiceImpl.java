@@ -4,6 +4,7 @@ import com.example.demo.domain.User;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.shell.HolidayShell;
 import com.example.demo.validator.UserValidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUser() {
+
         List<User> list = userRepository.findAll();
         List<UserDTO> userDTOList = new ArrayList<>();
         if (list != null) {
