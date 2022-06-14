@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-/**
 
- *
+/**
  * @author salasky
  * https://github.com/salasky/
  */
@@ -29,35 +28,32 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public List<UserDTO> getAllUser()
-    {
+    public List<UserDTO> getAllUser() {
         return userService.getAllUser();
     }
 
     @PostMapping("/add")
-    public ResponseEntity saveUser(@RequestBody User user)
-    {
-       return userService.createUser(user);
+    public ResponseEntity saveUser(@RequestBody User user) {
+        return userService.createUser(user);
 
     }
 
     @GetMapping("/get/{id}")
     public Optional<User> getUser(@PathVariable long id) {
-        Optional<User> user=userService.getUserById(id);
+        Optional<User> user = userService.getUserById(id);
         return user;
     }
 
     @PostMapping("/update")
-    public ResponseEntity updateUser(@RequestBody User user)
-    {
+    public ResponseEntity updateUser(@RequestBody User user) {
         return userService.updateUser(user);
 
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity deleteUser(@RequestBody User user)
-    {
-        return userService.deleteUser(user);
+    @GetMapping ("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity deleteUser(@PathVariable long id) {
+        return userService.deleteUser(id);
 
     }
 

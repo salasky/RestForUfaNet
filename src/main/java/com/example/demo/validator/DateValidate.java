@@ -2,10 +2,6 @@ package com.example.demo.validator;
 
 import org.springframework.stereotype.Component;
 
-import java.text.Format;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 @Component
@@ -32,7 +28,7 @@ public class DateValidate {
         return null == date ? false : DATE_PATTERN.matcher(date).matches();
     }
 
-    public boolean isValidDateTime(String datetime){
+    public boolean isValidDateTime(String datetime) {
         return null == datetime ? false : DATETIME_PATTERN.matcher(datetime).matches();
     }
 

@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
-
- *
  * @author salasky
  * https://github.com/salasky/
  */
@@ -26,16 +24,27 @@ public class OrderController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity saveUser(@RequestBody ClientIdDatetimeDTO clientIdDatetime)
-    {
+    public ResponseEntity saveUser(@RequestBody ClientIdDatetimeDTO clientIdDatetime) {
         return orderService.recordingClient(clientIdDatetime);
 
     }
+
     @PostMapping("/cancel")
-    public ResponseEntity cancelingRecord(@RequestBody ClientIdOrderIdDTO clientIdOrderIdDTO)
-    {
+    public ResponseEntity cancelingRecord(@RequestBody ClientIdOrderIdDTO clientIdOrderIdDTO) {
         return orderService.cancelingRecord(clientIdOrderIdDTO);
 
+    }
+
+    @GetMapping("/all/{date}")
+    @ResponseBody
+    public ResponseEntity getBusyTime(@PathVariable String date) {
+        return orderService.getBusyTime(date);
+    }
+
+    @GetMapping("/available/{date}")
+    @ResponseBody
+    public ResponseEntity getAvailableTime(@PathVariable String date) {
+        return orderService.getAvailableTime(date);
     }
 
 

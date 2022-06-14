@@ -3,8 +3,6 @@ package com.example.demo.dto;
 import lombok.*;
 
 /**
-
- *
  * @author salasky
  * https://github.com/salasky/
  */

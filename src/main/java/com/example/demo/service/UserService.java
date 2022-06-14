@@ -20,7 +20,7 @@ public interface UserService {
 	public List<UserDTO> getAllUser();
 	public Optional<User> getUserById(long id);
 	public ResponseEntity<String> updateUser(User user);
-	public ResponseEntity deleteUser(User user);
+	public ResponseEntity deleteUser(long id);
 
 
 }
